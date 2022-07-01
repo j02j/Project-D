@@ -8,46 +8,25 @@ using System;
 
 public class Loading : MonoBehaviour
 {
-    public static string nextScene;
     [SerializeField] Image progressBar;
     [SerializeField] TextMeshProUGUI loadpercentage;
-    [SerializeField] TextMeshProUGUI tiptext;
-    [SerializeField] Image img1;
-    [SerializeField] Image img2;
-    [SerializeField] Image img3;
-    [SerializeField] Image img4;
-    [SerializeField] Image img5;
-    [SerializeField] Image img6;
-    [SerializeField] Image img7;
-    [SerializeField] Image img8;
 
-    List<string> tips = new List<string>()
-    {
-        "낮선 곳에 떨어졌을 때에는 침착해야합니다.",
-        "항상 사람을 믿지 않고 상황을 믿어야합니다.",
-        "어떤 식으로든 살인은 살인을 낳습니다."
-    };
+    [SerializeField] Image background;
+    [SerializeField] TextMeshProUGUI tiptext;
 
     private void Start()
     {
+        RandomLoadingImage();
+        RandomLoadingTips();
+
         StartCoroutine(LoadScene());
     }
 
-    public static void LoadScene(string sceneName)
-    {
-        nextScene = sceneName;
-        SceneManager.LoadScene("Loading Scene");
-    }
-
-    public static void ClickRandomTips()
-    {
-        
-    }
 
     IEnumerator LoadScene()
     {
         yield return null;
-        AsyncOperation op = SceneManager.LoadSceneAsync(nextScene);
+        AsyncOperation op = SceneManager.LoadSceneAsync(GameManager.Scene.GetSceneName(GameManager.Scene.nextScene));
         op.allowSceneActivation = false;
         float timer = 0.0f;
 
@@ -77,6 +56,22 @@ public class Loading : MonoBehaviour
                 }
             }
 
+        }
+    }
+
+    void RandomLoadingImage()
+    {
+        int randNum = UnityEngine.Random.Range(0, Define.s_backgrounds.Count);
+        background.sprite = Resources.Load<Sprite>($"BackGround/{Define.s_backgrounds[randNum]}");
+    }
+
+    void RandomLoadingTips()
+    {
+        while (true)
+        {
+            int randNum = UnityEngine.Random.Range(0, Define.s_tips.Count);
+            tiptext.text = Define.s_tips[randNum];
+            break;
         }
     }
 }

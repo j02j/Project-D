@@ -6,9 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class Main : MonoBehaviour
 {
-    [SerializeField] Button PlayBtn;
+
     public void OnClickScene()
     {
-        Loading.LoadScene("Intro");
+        GameManager.Scene.LoadScene(Define.Scene.Intro);
     }
 }

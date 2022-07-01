@@ -7,161 +7,131 @@ using TMPro;
 
 public class Intro : MonoBehaviour
 {
+    [SerializeField] TextMeshProUGUI fiction;
+    [SerializeField] TextMeshProUGUI click;
+    [SerializeField] TextMeshProUGUI director;
+    [SerializeField] TextMeshProUGUI art;
+    [SerializeField] Image background;
+    [SerializeField] Image backPanel;
+    [SerializeField] Image block1;
+    [SerializeField] Image block2;
+    [SerializeField] Image block3;
 
-    [SerializeField] TextMeshProUGUI text1;
-    [SerializeField] TextMeshProUGUI text2;
-    [SerializeField] TextMeshProUGUI text3;
-    [SerializeField] TextMeshProUGUI text4;
-    [SerializeField] TextMeshProUGUI text5;
-    [SerializeField] Image img1;
-    [SerializeField] Image img2;
-    [SerializeField] Image img3;
-    [SerializeField] Image img4;
-    [SerializeField] Image img5;
-    [SerializeField] Image img6;
+    Sprite[] sprites;
+    Image[] blocks;
 
-    void Awake()
-    {
-        Button PlayBtn = GetComponent<Button>();
-        TextMeshProUGUI text = GetComponent<TextMeshProUGUI>();
-        Image img = GetComponent<Image>();
-
-        StartCoroutine(FadeTextToFullAlpha(text1, 1.0f));
-        StartCoroutine(FadeTextToFullAlphaBlink(text2, 0.8f));
-    }
+    int _count = 0;
+    float time = 0;
 
     void Start()
     {
+        sprites = new Sprite[3];
+        blocks = new Image[3] { block1, block2, block3 };
         
+        LoadSprite();
+
+        block1.gameObject.AddComponent<Button>();
+        block1.gameObject.GetComponent<Button>().onClick.AddListener(Block1);
+        block1.gameObject.GetComponent<Button>().transition = Selectable.Transition.None;
+
+        block2.gameObject.AddComponent<Button>();
+        block2.gameObject.GetComponent<Button>().onClick.AddListener(Block2);
+        block2.gameObject.GetComponent<Button>().transition = Selectable.Transition.None;
+
+        block3.gameObject.AddComponent<Button>();
+        block3.gameObject.GetComponent<Button>().onClick.AddListener(Block3);
+        block3.gameObject.GetComponent<Button>().transition = Selectable.Transition.None;
+
+        background.gameObject.AddComponent<Button>();
+        background.gameObject.GetComponent<Button>().onClick.AddListener(BackGround);
+        background.gameObject.GetComponent<Button>().transition = Selectable.Transition.None;
+
+        StartCoroutine(GameManager.Scene.FadeInAnimation(null, fiction));
+        StartCoroutine(GameManager.Scene.BlinkAnimation(null, click));   
     }
 
-    void Update()
-    {
 
-    }
-
-    public void OnClick1()
+    private void Update()
     {
-        GameBackgroundFadeOut(img1, text1, text2);
-    }
-    public void OnClick2()
-    {
-        StartCoroutine(FadeImgToZero(img2, 1.0f));
-        StartCoroutine(FadeTextToFullAlpha(text3, 1.0f));
-    }
-    public void OnClick3()
-    {
-        GameBackgroundFadeOut(img3, text3);
-    }
-    public void OnClick4()
-    {
-        StartCoroutine(FadeImgToZero(img4, 1.0f));
-        StartCoroutine(FadeTextToFullAlpha(text4, 1.0f));
-        StartCoroutine(FadeTextToFullAlpha(text5, 1.0f));
-    }
-    public void OnClick5()
-    {
-        GameBackgroundFadeOut(img5, text4);
-    }
-    public void OnClick6()
-    {
-        StartCoroutine(FadeImgToZero(img6, 1.0f));
-        Loading.LoadScene("Play Scene1");
-
+        time += Time.deltaTime;
     }
 
-    public void GameBackgroundFadeOut(Image img, TextMeshProUGUI text) //뒷배경 서서히 없어지는 애니메이션 후 오브젝트 파괴
+    public void LoadSprite()
     {
-        StopAllCoroutines();
-        StartCoroutine(FadeImgToZero(img, 2.0f));
-        StartCoroutine(FadeTextToZeroDestroy(text, 2.0f));
-    }
-    public void GameBackgroundFadeOut(Image img, TextMeshProUGUI text1, TextMeshProUGUI text2)
-    {
-        StopAllCoroutines();
-        StartCoroutine(FadeImgToZero(img, 2.0f));
-        StartCoroutine(FadeTextToZeroDestroy(text1, 2.0f));
-        StartCoroutine(FadeTextToZeroDestroy(text2, 2.0f));
-
+        sprites[0] = Resources.Load<Sprite>("BackGround/지훈의방(밤)");
+        sprites[1] = Resources.Load<Sprite>("BackGround/경찰서(밖_밤)");
+        sprites[2] = Resources.Load<Sprite>("BackGround/경찰서(안_밤)");
     }
 
-    public IEnumerator BlinkTextAnim(TextMeshProUGUI text, float time) //깜빡이는 클릭유도 애니메이션
+    public void Block1()
     {
-        yield return null;
+        if (time <= 2) return;
+
+        block1.gameObject.SetActive(false);
+        _count++;
+        ChangeImage();
+        background.gameObject.SetActive(true);
+        StartCoroutine(GameManager.Scene.FadeOutAnimation(backPanel));
+
+        time = 0;
     }
+
+    public void Block2()
+    {
+        if (time <= 2) return;
+
+        block2.gameObject.SetActive(false);
+        _count++;
+        ChangeImage();
+        background.gameObject.SetActive(true);
+        StartCoroutine(GameManager.Scene.FadeOutAnimation(backPanel));
     
-    public IEnumerator FadeTextToFullAlpha(TextMeshProUGUI text, float time) // 투명도 0 에서 1로 만드는 함수 (텍스트)
-    {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a);
-        while (text.color.a < 1.0f)
-        {
-            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a + (Time.deltaTime / time));
-            yield return null;
-        }
+        time = 0;
     }
 
-    public IEnumerator FadeTextToFullAlphaBlink(TextMeshProUGUI text, float time) // 투명도 0 에서 1로 만드는 함수 (텍스트)
+    public void Block3()
     {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a);
-        while (text.color.a < 1.0f)
-        {
-            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a + (Time.deltaTime / time));
-            yield return null;
-        }
-        StartCoroutine(FadeTextToZeroBlink(text, time));
+        if (time <= 2) return;
+        
+        block3.gameObject.SetActive(false);
+        _count++;
+        ChangeImage();
+        background.gameObject.SetActive(true);
+        StartCoroutine(GameManager.Scene.FadeOutAnimation(backPanel));
+    
+        time = 0;
     }
 
-    public IEnumerator FadeTextToZero(TextMeshProUGUI text, float time) // 투명도 1 에서 0으로 만드는 함수 (텍스트)
+    public void ChangeImage()
     {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a);
-        while (text.color.a > 0.0f)
-        {
-            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (Time.deltaTime / time));
-            yield return null;
-        }
+        background.sprite = sprites[_count - 1];
     }
 
-    public IEnumerator FadeTextToZeroDestroy(TextMeshProUGUI text, float time) // 투명도 1 에서 0으로 만들고 파괴하는 함수 (텍스트)
+    public void BackGround()
     {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a);
-        while (text.color.a > 0.0f)
+        if (time <= 2) return;
+        
+        background.gameObject.SetActive(false);
+        
+        if (_count == 1)
         {
-            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (Time.deltaTime / time));
-            yield return null;
+            StartCoroutine(GameManager.Scene.FadeInAnimation(null, director));
+            blocks[_count].gameObject.SetActive(true);
         }
-        Destroy(text);
+        if (_count == 2)
+        {
+            StartCoroutine(GameManager.Scene.FadeInAnimation(null, art));
+            blocks[_count].gameObject.SetActive(true);
+        }
+        if(_count == 3)
+        {
+            GameManager.Scene.LoadScene(Define.Scene.PlayScene1);
+        }
+    
+        time = 0;
     }
 
-    public IEnumerator FadeTextToZeroBlink(TextMeshProUGUI text, float time) // 투명도 1 에서 0으로 만드는 함수 (텍스트)
-    {
-        text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a);
-        while (text.color.a > 0.0f)
-        {
-            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (Time.deltaTime / time));
-            yield return null;
-        }
-        StartCoroutine(FadeTextToFullAlphaBlink(text, time));
-    }
 
-    public IEnumerator FadeImgToZero(Image img, float time) // 투명도 1 에서 0으로 만드는 함수 (이미지)
-    {
-        img.color = new Color(img.color.r, img.color.g, img.color.b, img.color.a);
-        while (img.color.a > 0.0f)
-        {
-            img.color = new Color(img.color.r, img.color.g, img.color.b, img.color.a - (Time.deltaTime / time));
-            yield return null;
-        }
-        Destroy(img);
-    }
 
-    public IEnumerator FadeImgToFullAlpha(Image img, float time) // 투명도 0 에서 1로 만드는 함수 (이미지)
-    {
-        img.color = new Color(img.color.r, img.color.g, img.color.b, img.color.a);
-        while (text1.color.a < 1.0f)
-        {
-            img.color = new Color(img.color.r, img.color.g, img.color.b, img.color.a - (Time.deltaTime / time));
-            yield return null;
-        }
-    }
 
 }

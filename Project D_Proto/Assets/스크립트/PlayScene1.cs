@@ -18,6 +18,6 @@ public class PlayScene1 : MonoBehaviour
 
     public void OnClickScene()
     {
-        Loading.LoadScene("Play Scene2");
+        //Loading.LoadScene("Play Scene2");
     }
 }
